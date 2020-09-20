@@ -1,0 +1,14 @@
+.DS_Store
+__pycache__/
+._*
+.pyc
+.vscode/
+*.pyc
+*.sif
+heb_coeffs/
+weights/
+PCA/
+evaluate_for_pca.py
+evaluate_vw.py
+jobs/
+terminal_outputs/
