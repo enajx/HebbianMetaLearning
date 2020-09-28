@@ -88,9 +88,8 @@ If you use the code for academic or commecial use, please cite the associated pa
 @article{Najarro2020,
 	title = {{Meta-Learning through Hebbian Plasticity in Random Networks}},
 	author = {Najarro, Elias and Risi, Sebastian},
-	journal = {ArXiv e-prints},
+	journal = {Advances in Neural Information Processing Systems},
 	year = {2020},
-	eprint = {2007.02686},
 	url = {https://arxiv.org/abs/2007.02686}
 }
 
