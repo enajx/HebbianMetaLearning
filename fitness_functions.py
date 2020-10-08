@@ -228,5 +228,6 @@ def fitness_hebb(hebb_rule : str, environment : str, init_weights = 'uni' , *evo
             
         env.close()
 
-    return max(rew_ep, 0)
+    return rew_ep
+    # return max(rew_ep, 0)
 
