@@ -6,8 +6,7 @@
 # Meta-Learning through Hebbian Plasticity in Random Networks   
 
 [![Paper](https://img.shields.io/badge/paper-arxiv.2007.02686-B31B1B.svg)](https://arxiv.org/abs/2007.02686)
-![Conference](http://img.shields.io/badge/NeurIPS-2020-4b44ce.svg)
-<!-- [![Conference](http://img.shields.io/badge/NeurIPS-2020-4b44ce.svg)]('add_proceedings_link_here') -->
+[![Conference](http://img.shields.io/badge/NeurIPS-2020-4b44ce.svg)](https://nips.cc/Conferences/2020/AcceptedPapersInitial)
 
 </div>
  
