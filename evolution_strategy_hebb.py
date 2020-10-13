@@ -67,7 +67,7 @@ class EvolutionStrategyHebb(object):
         # The number of hebbian coefficients per synapse
         if hebb_rule == 'A':                                                     
             self.coefficients_per_synapse = 1
-        if hebb_rule == 'AD':                                                
+        elif hebb_rule == 'AD':                                                
             self.coefficients_per_synapse = 2
         elif hebb_rule == 'AD_lr':                                             
             self.coefficients_per_synapse = 3
