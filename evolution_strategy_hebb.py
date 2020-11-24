@@ -31,27 +31,27 @@ def compute_centered_ranks(x):
 
             
 def worker_process_hebb(arg):
-    get_reward_func, hebb_rule,  eng,  init_weights, coeffs = arg
+    get_reward_func, hebb_rule, number_rules, eng,  init_weights, coeffs = arg
     
     wp = np.array(coeffs)
     decay = - 0.01 * np.mean(wp**2)
-    r = get_reward_func( hebb_rule,  eng,  init_weights, coeffs) + decay
+    r = get_reward_func( hebb_rule,  number_rules, eng,  init_weights, coeffs) + decay
     
     return r 
 
 
 def worker_process_hebb_coevo(arg): 
-    get_reward_func,  hebb_rule,  eng,  init_weights, coeffs, coevolved_parameters = arg
+    get_reward_func,  hebb_rule,  number_rules, eng,  init_weights, coeffs, coevolved_parameters = arg
     
     wp = np.array(coeffs)
     decay = - 0.01 * np.mean(wp**2)
-    r = get_reward_func( hebb_rule,  eng,  init_weights, coeffs, coevolved_parameters) + decay
+    r = get_reward_func( hebb_rule,  number_rules, eng,  init_weights, coeffs, coevolved_parameters) + decay
 
     return r 
 
 
 class EvolutionStrategyHebb(object):
-    def __init__(self, hebb_rule,  environment, init_weights = 'uni', population_size=100, sigma=0.1, learning_rate=0.2, decay=0.995, num_threads=1, distribution = 'normal'):
+    def __init__(self, hebb_rule,  environment, init_weights = 'uni', population_size=100, sigma=0.1, learning_rate=0.2, decay=0.995, num_threads=1, distribution = 'normal', num_rules = 128):
         
         self.hebb_rule = hebb_rule                     
         self.environment = environment                         
@@ -63,6 +63,7 @@ class EvolutionStrategyHebb(object):
         self.num_threads = mp.cpu_count() if num_threads == -1 else num_threads
         self.update_factor = self.learning_rate / (self.POPULATION_SIZE * self.SIGMA)
         self.distribution = distribution                      
+        self.number_rules = num_rules                      
 
         # The number of hebbian coefficients per synapse
         if hebb_rule == 'A':                                                     
@@ -119,7 +120,10 @@ class EvolutionStrategyHebb(object):
         # Pixel-based environments (CNN + MLP)       
         if self.pixel_env:
             cnn_weights = 1362                                                                                        #  CNN: (6, 3, 3, 3) + (8, 6, 5, 5) = 162+1200 = 1362
-            plastic_weights = (128*648) + (64*128) + (action_dim*64)                                                  #  Hebbian coefficients: MLP x coefficients_per_synapse : plastic_weights x coefficients_per_synapse
+            if self.number_rules == 0:
+                plastic_weights = (128*648) + (64*128) + (action_dim*64)                                                  #  Hebbian coefficients: MLP x coefficients_per_synapse : plastic_weights x coefficients_per_synapse
+            else:
+                plastic_weights = self.number_rules                                              
             
             # Co-evolution of initial weights
             if self.coevolve_init:
@@ -143,7 +147,10 @@ class EvolutionStrategyHebb(object):
                 
         # State-vector environments (MLP)            
         else:
-            plastic_weights = (128*input_dim) + (64*128) + (action_dim*64)                                            #  Hebbian coefficients:  MLP x coefficients_per_synapse :plastic_weights x coefficients_per_synapse
+            if self.number_rules == 0:
+                plastic_weights = (128*input_dim) + (64*128) + (action_dim*64)                                            #  Hebbian coefficients:  MLP x coefficients_per_synapse :plastic_weights x coefficients_per_synapse
+            else:
+                plastic_weights = self.number_rules
             
             # Co-evolution of initial weights
             if self.coevolve_init:
@@ -228,7 +235,7 @@ class EvolutionStrategyHebb(object):
                 heb_coeffs_try = np.array(heb_coeffs_try1)
 
                 
-                worker_args.append( (self.get_reward, self.hebb_rule, self.environment,  self.init_weights,  heb_coeffs_try) )
+                worker_args.append( (self.get_reward, self.hebb_rule, self.number_rules, self.environment,  self.init_weights,  heb_coeffs_try) )
                 
             rewards  = pool.map(worker_process_hebb, worker_args)
             
@@ -236,7 +243,7 @@ class EvolutionStrategyHebb(object):
             rewards = []
             for p in population:
                 heb_coeffs_try = np.array(self._get_params_try(self.coeffs, p))
-                rewards.append(self.get_reward( self.hebb_rule, self.environment,  self.init_weights, heb_coeffs_try))
+                rewards.append(self.get_reward( self.hebb_rule, self.number_rules, self.environment,  self.init_weights, heb_coeffs_try))
         rewards = np.array(rewards)
 
         return rewards
@@ -260,7 +267,7 @@ class EvolutionStrategyHebb(object):
                     coevolved_parameters_try1.append(self.initial_weights_co[index] + jittered) 
                 coevolved_parameters_try = np.array(coevolved_parameters_try1)
             
-                worker_args.append( (self.get_reward, self.hebb_rule,  self.environment,  self.init_weights, heb_coeffs_try, coevolved_parameters_try) )
+                worker_args.append( (self.get_reward, self.hebb_rule,  self.number_rules, self.environment,  self.init_weights, heb_coeffs_try, coevolved_parameters_try) )
                 
             rewards  = pool.map(worker_process_hebb_coevo, worker_args)
             
@@ -269,7 +276,7 @@ class EvolutionStrategyHebb(object):
             for z in range(len(population)):
                 heb_coeffs_try = np.array(self._get_params_try(self.coeffs, population[z]))
                 coevolved_parameters_try = np.array(self._get_params_try(self.initial_weights_co, population_coevolved[z]))
-                rewards.append(self.get_reward( self.hebb_rule,  self.environment,  self.init_weights, heb_coeffs_try, coevolved_parameters_try))
+                rewards.append(self.get_reward( self.hebb_rule,  self.number_rules, self.environment,  self.init_weights, heb_coeffs_try, coevolved_parameters_try))
         rewards = np.array(rewards)
 
         return rewards
@@ -346,9 +353,9 @@ class EvolutionStrategyHebb(object):
             # Print fitness and save Hebbian coefficients and/or Coevolved / CNNs parameters
             if (iteration + 1) % print_step == 0:
                 if self.pixel_env or self.coevolve_init:
-                    rew_ = np.sum(self.get_reward( self.hebb_rule,  self.environment,  self.init_weights, self.coeffs, self.initial_weights_co))
+                    rew_ = np.sum(self.get_reward( self.hebb_rule,  self.number_rules, self.environment,  self.init_weights, self.coeffs, self.initial_weights_co))
                 else:
-                    rew_ = np.sum(self.get_reward( self.hebb_rule,  self.environment,  self.init_weights, self.coeffs))                
+                    rew_ = np.sum(self.get_reward( self.hebb_rule,  self.number_rules, self.environment,  self.init_weights, self.coeffs))                
                 print('iter %4i | reward: %3i |  update_factor: %f  lr: %f | sum_coeffs: %i sum_abs_coeffs: %4i' % (iteration + 1, rew_ , self.update_factor, self.learning_rate, int(np.sum(self.coeffs)), int(np.sum(abs(self.coeffs)))), flush=True)
                 torch.save(self.get_coeffs(),  path + "/"+ id_ + '/HEBcoeffs__' + self.environment + "__rew_" + str(int(rew_)) + '__' + self.hebb_rule + "__init_" + str(self.init_weights) + "__pop_" + str(self.POPULATION_SIZE) + '__coeffs' + "__{}.dat".format(iteration))
                 if self.coevolve_init:

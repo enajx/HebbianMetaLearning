@@ -3,20 +3,20 @@ from numba import njit
 
     
 @njit
-def hebbian_update_A(heb_coeffs, weights1_2, weights2_3, weights3_4, o0, o1, o2, o3):
+def hebbian_update_A(heb_coeffs, weights1_2, weights2_3, weights3_4, o0, o1, o2, o3, num_rules):
         
         heb_offset = 0
         # Layer 1         
         for i in range(weights1_2.shape[1]): 
             for j in range(weights1_2.shape[0]):  
-                idx = (weights1_2.shape[0]-1)*i + i + j
+                idx = ((weights1_2.shape[0]-1)*i + i + j)%num_rules
                 weights1_2[:,i][j] += heb_coeffs[idx] * o0[i] * o1[j]  
 
         heb_offset = weights1_2.shape[1] * weights1_2.shape[0]
         # Layer 2
         for i in range(weights2_3.shape[1]): 
             for j in range(weights2_3.shape[0]):  
-                idx = heb_offset + (weights2_3.shape[0]-1)*i + i+j
+                idx = (heb_offset + (weights2_3.shape[0]-1)*i + i+j)%num_rules
                 weights2_3[:,i][j] += heb_coeffs[idx] * o1[i] * o2[j] 
     
     
@@ -24,7 +24,7 @@ def hebbian_update_A(heb_coeffs, weights1_2, weights2_3, weights3_4, o0, o1, o2,
         # Layer 3
         for i in range(weights3_4.shape[1]): 
             for j in range(weights3_4.shape[0]):  
-                idx = heb_offset + (weights3_4.shape[0]-1)*i + i+j 
+                idx = (heb_offset + (weights3_4.shape[0]-1)*i + i+j )%num_rules
                 weights3_4[:,i][j] += heb_coeffs[idx] * o2[i] * o3[j] 
 
         return weights1_2, weights2_3, weights3_4
@@ -32,20 +32,20 @@ def hebbian_update_A(heb_coeffs, weights1_2, weights2_3, weights3_4, o0, o1, o2,
 
 
 @njit
-def hebbian_update_AD(heb_coeffs, weights1_2, weights2_3, weights3_4, o0, o1, o2, o3):
+def hebbian_update_AD(heb_coeffs, weights1_2, weights2_3, weights3_4, o0, o1, o2, o3, num_rules):
         
         heb_offset = 0
         # Layer 1         
         for i in range(weights1_2.shape[1]): 
             for j in range(weights1_2.shape[0]):  
-                idx = (weights1_2.shape[0]-1)*i + i + j
+                idx = ((weights1_2.shape[0]-1)*i + i + j)%num_rules
                 weights1_2[:,i][j] += heb_coeffs[idx][0] * o0[i] * o1[j] + heb_coeffs[idx][1] 
 
         heb_offset = weights1_2.shape[1] * weights1_2.shape[0]
         # Layer 2
         for i in range(weights2_3.shape[1]): 
             for j in range(weights2_3.shape[0]):  
-                idx = heb_offset + (weights2_3.shape[0]-1)*i + i+j
+                idx = (heb_offset + (weights2_3.shape[0]-1)*i + i+j)%num_rules
                 weights2_3[:,i][j] += heb_coeffs[idx][0] * o1[i] * o2[j] + heb_coeffs[idx][1]  
     
     
@@ -53,27 +53,27 @@ def hebbian_update_AD(heb_coeffs, weights1_2, weights2_3, weights3_4, o0, o1, o2
         # Layer 3
         for i in range(weights3_4.shape[1]): 
             for j in range(weights3_4.shape[0]):  
-                idx = heb_offset + (weights3_4.shape[0]-1)*i + i+j 
+                idx = (heb_offset + (weights3_4.shape[0]-1)*i + i+j )%num_rules
                 weights3_4[:,i][j] += heb_coeffs[idx][0] * o2[i] * o3[j] + heb_coeffs[idx][1] 
 
 
         return weights1_2, weights2_3, weights3_4
     
 @njit
-def hebbian_update_AD_lr(heb_coeffs, weights1_2, weights2_3, weights3_4, o0, o1, o2, o3):
+def hebbian_update_AD_lr(heb_coeffs, weights1_2, weights2_3, weights3_4, o0, o1, o2, o3, num_rules):
         
         heb_offset = 0
         # Layer 1         
         for i in range(weights1_2.shape[1]): 
             for j in range(weights1_2.shape[0]):  
-                idx = (weights1_2.shape[0]-1)*i + i + j
+                idx = ((weights1_2.shape[0]-1)*i + i + j)%num_rules
                 weights1_2[:,i][j] += (heb_coeffs[idx][0] * o0[i] * o1[j] + heb_coeffs[idx][1]) *  heb_coeffs[idx][2] 
 
         heb_offset = weights1_2.shape[1] * weights1_2.shape[0]
         # Layer 2
         for i in range(weights2_3.shape[1]): 
             for j in range(weights2_3.shape[0]):  
-                idx = heb_offset + (weights2_3.shape[0]-1)*i + i+j
+                idx = (heb_offset + (weights2_3.shape[0]-1)*i + i+j)%num_rules
                 weights2_3[:,i][j] += (heb_coeffs[idx][0] * o1[i] * o2[j] + heb_coeffs[idx][1]) *  heb_coeffs[idx][2]   
     
     
@@ -81,7 +81,7 @@ def hebbian_update_AD_lr(heb_coeffs, weights1_2, weights2_3, weights3_4, o0, o1,
         # Layer 3
         for i in range(weights3_4.shape[1]): 
             for j in range(weights3_4.shape[0]):  
-                idx = heb_offset + (weights3_4.shape[0]-1)*i + i+j 
+                idx = (heb_offset + (weights3_4.shape[0]-1)*i + i+j )%num_rules
                 weights3_4[:,i][j] += (heb_coeffs[idx][0] * o2[i] * o3[j] + heb_coeffs[idx][1]) *  heb_coeffs[idx][2] 
 
 
@@ -90,13 +90,13 @@ def hebbian_update_AD_lr(heb_coeffs, weights1_2, weights2_3, weights3_4, o0, o1,
 
 
 @njit
-def hebbian_update_ABC(heb_coeffs, weights1_2, weights2_3, weights3_4, o0, o1, o2, o3):
+def hebbian_update_ABC(heb_coeffs, weights1_2, weights2_3, weights3_4, o0, o1, o2, o3, num_rules):
         
         heb_offset = 0
         # Layer 1         
         for i in range(weights1_2.shape[1]): 
             for j in range(weights1_2.shape[0]):  
-                idx = (weights1_2.shape[0]-1)*i + i + j
+                idx = ((weights1_2.shape[0]-1)*i + i + j)%num_rules
                 weights1_2[:,i][j] += ( heb_coeffs[idx][0] * o0[i] * o1[j]
                                       + heb_coeffs[idx][1] * o0[i] 
                                       + heb_coeffs[idx][2]         * o1[j])  
@@ -105,7 +105,7 @@ def hebbian_update_ABC(heb_coeffs, weights1_2, weights2_3, weights3_4, o0, o1, o
         # Layer 2
         for i in range(weights2_3.shape[1]): 
             for j in range(weights2_3.shape[0]):  
-                idx = heb_offset + (weights2_3.shape[0]-1)*i + i+j
+                idx = (heb_offset + (weights2_3.shape[0]-1)*i + i+j)%num_rules
                 weights2_3[:,i][j] += ( heb_coeffs[idx][0] * o1[i] * o2[j]
                                       + heb_coeffs[idx][1] * o1[i] 
                                       + heb_coeffs[idx][2]         * o2[j])  
@@ -114,7 +114,7 @@ def hebbian_update_ABC(heb_coeffs, weights1_2, weights2_3, weights3_4, o0, o1, o
         # Layer 3
         for i in range(weights3_4.shape[1]): 
             for j in range(weights3_4.shape[0]):  
-                idx = heb_offset + (weights3_4.shape[0]-1)*i + i+j 
+                idx = (heb_offset + (weights3_4.shape[0]-1)*i + i+j )%num_rules
                 weights3_4[:,i][j] += ( heb_coeffs[idx][0] * o2[i] * o3[j]
                                       + heb_coeffs[idx][1] * o2[i] 
                                       + heb_coeffs[idx][2]         * o3[j])  
@@ -123,13 +123,13 @@ def hebbian_update_ABC(heb_coeffs, weights1_2, weights2_3, weights3_4, o0, o1, o
 
 
 @njit
-def hebbian_update_ABC_lr(heb_coeffs, weights1_2, weights2_3, weights3_4, o0, o1, o2, o3):
+def hebbian_update_ABC_lr(heb_coeffs, weights1_2, weights2_3, weights3_4, o0, o1, o2, o3, num_rules):
         
         heb_offset = 0
         # Layer 1        
         for i in range(weights1_2.shape[1]): 
             for j in range(weights1_2.shape[0]):  
-                idx = (weights1_2.shape[0]-1)*i + i + j
+                idx = ((weights1_2.shape[0]-1)*i + i + j)%num_rules
                 weights1_2[:,i][j] += heb_coeffs[idx][3] * ( heb_coeffs[idx][0] * o0[i] * o1[j]
                                                            + heb_coeffs[idx][1] * o0[i] 
                                                            + heb_coeffs[idx][2]         * o1[j])
@@ -138,7 +138,7 @@ def hebbian_update_ABC_lr(heb_coeffs, weights1_2, weights2_3, weights3_4, o0, o1
         # Layer 2
         for i in range(weights2_3.shape[1]): 
             for j in range(weights2_3.shape[0]):  
-                idx = heb_offset + (weights2_3.shape[0]-1)*i + i+j
+                idx = (heb_offset + (weights2_3.shape[0]-1)*i + i+j)%num_rules
                 weights2_3[:,i][j] += heb_coeffs[idx][3] * ( heb_coeffs[idx][0] * o1[i] * o2[j]
                                                            + heb_coeffs[idx][1] * o1[i] 
                                                            + heb_coeffs[idx][2]         * o2[j])  
@@ -147,7 +147,7 @@ def hebbian_update_ABC_lr(heb_coeffs, weights1_2, weights2_3, weights3_4, o0, o1
         # Layer 3
         for i in range(weights3_4.shape[1]): 
             for j in range(weights3_4.shape[0]):  
-                idx = heb_offset + (weights3_4.shape[0]-1)*i + i+j 
+                idx = (heb_offset + (weights3_4.shape[0]-1)*i + i+j )%num_rules
                 weights3_4[:,i][j] += heb_coeffs[idx][3] * ( heb_coeffs[idx][0] * o2[i] * o3[j]
                                                            + heb_coeffs[idx][1] * o2[i] 
                                                            + heb_coeffs[idx][2]         * o3[j])  
@@ -155,13 +155,13 @@ def hebbian_update_ABC_lr(heb_coeffs, weights1_2, weights2_3, weights3_4, o0, o1
         return weights1_2, weights2_3, weights3_4
 
 @njit
-def hebbian_update_ABCD(heb_coeffs, weights1_2, weights2_3, weights3_4, o0, o1, o2, o3):
+def hebbian_update_ABCD(heb_coeffs, weights1_2, weights2_3, weights3_4, o0, o1, o2, o3, num_rules):
         
         heb_offset = 0
         # Layer 1        
         for i in range(weights1_2.shape[1]): 
             for j in range(weights1_2.shape[0]):  
-                idx = (weights1_2.shape[0]-1)*i + i + j
+                idx = ((weights1_2.shape[0]-1)*i + i + j)%num_rules
                 weights1_2[:,i][j] += heb_coeffs[idx][3] + ( heb_coeffs[idx][0] * o0[i] * o1[j]
                                                            + heb_coeffs[idx][1] * o0[i] 
                                                            + heb_coeffs[idx][2]         * o1[j])
@@ -170,7 +170,7 @@ def hebbian_update_ABCD(heb_coeffs, weights1_2, weights2_3, weights3_4, o0, o1, 
         # Layer 2
         for i in range(weights2_3.shape[1]): 
             for j in range(weights2_3.shape[0]):  
-                idx = heb_offset + (weights2_3.shape[0]-1)*i + i+j
+                idx = (heb_offset + (weights2_3.shape[0]-1)*i + i+j)%num_rules
                 weights2_3[:,i][j] += heb_coeffs[idx][3] + ( heb_coeffs[idx][0] * o1[i] * o2[j]
                                                            + heb_coeffs[idx][1] * o1[i] 
                                                            + heb_coeffs[idx][2]         * o2[j])  
@@ -179,7 +179,7 @@ def hebbian_update_ABCD(heb_coeffs, weights1_2, weights2_3, weights3_4, o0, o1, 
         # Layer 3
         for i in range(weights3_4.shape[1]): 
             for j in range(weights3_4.shape[0]):  
-                idx = heb_offset + (weights3_4.shape[0]-1)*i + i+j 
+                idx = (heb_offset + (weights3_4.shape[0]-1)*i + i+j )%num_rules
                 weights3_4[:,i][j] += heb_coeffs[idx][3] + ( heb_coeffs[idx][0] * o2[i] * o3[j]
                                                            + heb_coeffs[idx][1] * o2[i] 
                                                            + heb_coeffs[idx][2]         * o3[j])  
@@ -188,13 +188,13 @@ def hebbian_update_ABCD(heb_coeffs, weights1_2, weights2_3, weights3_4, o0, o1, 
     
     
 @njit    
-def hebbian_update_ABCD_lr_D_in(heb_coeffs, weights1_2, weights2_3, weights3_4, o0, o1, o2, o3):
+def hebbian_update_ABCD_lr_D_in(heb_coeffs, weights1_2, weights2_3, weights3_4, o0, o1, o2, o3, num_rules):
        
         heb_offset = 0
         ## Layer 1         
         for i in range(weights1_2.shape[1]): 
             for j in range(weights1_2.shape[0]): 
-                idx = (weights1_2.shape[0]-1)*i + i + j
+                idx = ((weights1_2.shape[0]-1)*i + i + j)%num_rules
                 weights1_2[:,i][j] += heb_coeffs[idx][3] * ( heb_coeffs[idx][0] * o0[i] * o1[j]
                                                            + heb_coeffs[idx][1] * o0[i] 
                                                            + heb_coeffs[idx][2]         * o1[j]  + heb_coeffs[idx][4])
@@ -203,7 +203,7 @@ def hebbian_update_ABCD_lr_D_in(heb_coeffs, weights1_2, weights2_3, weights3_4, 
         # Layer 2
         for i in range(weights2_3.shape[1]): 
             for j in range(weights2_3.shape[0]):
-                idx = heb_offset + (weights2_3.shape[0]-1)*i + i+j
+                idx = (heb_offset + (weights2_3.shape[0]-1)*i + i+j)%num_rules
                 weights2_3[:,i][j] += heb_coeffs[idx][3] * ( heb_coeffs[idx][0] * o1[i] * o2[j]
                                                            + heb_coeffs[idx][1] * o1[i] 
                                                            + heb_coeffs[idx][2]         * o2[j]  + heb_coeffs[idx][4])
@@ -212,22 +212,23 @@ def hebbian_update_ABCD_lr_D_in(heb_coeffs, weights1_2, weights2_3, weights3_4, 
         # Layer 3
         for i in range(weights3_4.shape[1]): 
             for j in range(weights3_4.shape[0]): 
-                idx = heb_offset + (weights3_4.shape[0]-1)*i + i+j 
+                idx = (heb_offset + (weights3_4.shape[0]-1)*i + i+j)%num_rules
                 weights3_4[:,i][j] += heb_coeffs[idx][3] * ( heb_coeffs[idx][0] * o2[i] * o3[j]
                                                            + heb_coeffs[idx][1] * o2[i] 
                                                            + heb_coeffs[idx][2]         * o3[j]  + heb_coeffs[idx][4])
                 
         return weights1_2, weights2_3, weights3_4
     
+
     
 @njit
-def hebbian_update_ABCD_lr_D_out(heb_coeffs, weights1_2, weights2_3, weights3_4, o0, o1, o2, o3):
+def hebbian_update_ABCD_lr_D_out(heb_coeffs, weights1_2, weights2_3, weights3_4, o0, o1, o2, o3, num_rules):
        
         heb_offset = 0
         # Layer 1         
         for i in range(weights1_2.shape[1]): 
             for j in range(weights1_2.shape[0]):  
-                idx = (weights1_2.shape[0]-1)*i + i + j
+                idx = ((weights1_2.shape[0]-1)*i + i + j)%num_rules
                 weights1_2[:,i][j] += heb_coeffs[idx][3] * ( heb_coeffs[idx][0] * o0[i] * o1[j]
                                                            + heb_coeffs[idx][1] * o0[i] 
                                                            + heb_coeffs[idx][2]         * o1[j])  + heb_coeffs[idx][4]
@@ -236,7 +237,7 @@ def hebbian_update_ABCD_lr_D_out(heb_coeffs, weights1_2, weights2_3, weights3_4,
         # Layer 2
         for i in range(weights2_3.shape[1]): 
             for j in range(weights2_3.shape[0]):  
-                idx = heb_offset + (weights2_3.shape[0]-1)*i + i+j
+                idx = (heb_offset + (weights2_3.shape[0]-1)*i + i+j)%num_rules
                 weights2_3[:,i][j] += heb_coeffs[idx][3] * ( heb_coeffs[idx][0] * o1[i] * o2[j]
                                                            + heb_coeffs[idx][1] * o1[i] 
                                                            + heb_coeffs[idx][2]         * o2[j])  + heb_coeffs[idx][4]
@@ -245,7 +246,7 @@ def hebbian_update_ABCD_lr_D_out(heb_coeffs, weights1_2, weights2_3, weights3_4,
         # Layer 3
         for i in range(weights3_4.shape[1]): 
             for j in range(weights3_4.shape[0]):  
-                idx = heb_offset + (weights3_4.shape[0]-1)*i + i+j 
+                idx = (heb_offset + (weights3_4.shape[0]-1)*i + i+j )%num_rules
                 weights3_4[:,i][j] += heb_coeffs[idx][3] * ( heb_coeffs[idx][0] * o2[i] * o3[j]
                                                            + heb_coeffs[idx][1] * o2[i] 
                                                            + heb_coeffs[idx][2]         * o3[j])  + heb_coeffs[idx][4]
@@ -253,13 +254,13 @@ def hebbian_update_ABCD_lr_D_out(heb_coeffs, weights1_2, weights2_3, weights3_4,
         return weights1_2, weights2_3, weights3_4
 
 @njit
-def hebbian_update_ABCD_lr_D_in_and_out(heb_coeffs, weights1_2, weights2_3, weights3_4, o0, o1, o2, o3):
+def hebbian_update_ABCD_lr_D_in_and_out(heb_coeffs, weights1_2, weights2_3, weights3_4, o0, o1, o2, o3, num_rules):
        
         heb_offset = 0
         # Layer 1         
         for i in range(weights1_2.shape[1]): 
             for j in range(weights1_2.shape[0]):  
-                idx = (weights1_2.shape[0]-1)*i + i + j
+                idx = ((weights1_2.shape[0]-1)*i + i + j)%num_rules
                 weights1_2[:,i][j] += heb_coeffs[idx][3] * ( heb_coeffs[idx][0] * o0[i] * o1[j]
                                                            + heb_coeffs[idx][1] * o0[i] 
                                                            + heb_coeffs[idx][2]         * o1[j]  + heb_coeffs[idx][4]) + heb_coeffs[idx][5]
@@ -268,7 +269,7 @@ def hebbian_update_ABCD_lr_D_in_and_out(heb_coeffs, weights1_2, weights2_3, weig
         # Layer 2
         for i in range(weights2_3.shape[1]): 
             for j in range(weights2_3.shape[0]):  
-                idx = heb_offset + (weights2_3.shape[0]-1)*i + i+j
+                idx = (heb_offset + (weights2_3.shape[0]-1)*i + i+j)%num_rules
                 weights2_3[:,i][j] += heb_coeffs[idx][3] * ( heb_coeffs[idx][0] * o1[i] * o2[j]
                                                            + heb_coeffs[idx][1] * o1[i] 
                                                            + heb_coeffs[idx][2]         * o2[j]  + heb_coeffs[idx][4]) + heb_coeffs[idx][5]
@@ -277,7 +278,7 @@ def hebbian_update_ABCD_lr_D_in_and_out(heb_coeffs, weights1_2, weights2_3, weig
         # Layer 3
         for i in range(weights3_4.shape[1]): 
             for j in range(weights3_4.shape[0]):  
-                idx = heb_offset + (weights3_4.shape[0]-1)*i + i+j 
+                idx = (heb_offset + (weights3_4.shape[0]-1)*i + i+j )%num_rules
                 weights3_4[:,i][j] += heb_coeffs[idx][3] * ( heb_coeffs[idx][0] * o2[i] * o3[j]
                                                            + heb_coeffs[idx][1] * o2[i] 
                                                            + heb_coeffs[idx][2]         * o3[j]  + heb_coeffs[idx][4]) + heb_coeffs[idx][5]
