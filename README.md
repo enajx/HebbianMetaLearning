@@ -6,7 +6,7 @@
 # Meta-Learning through Hebbian Plasticity in Random Networks   
 
 [![Paper](https://img.shields.io/badge/paper-arxiv.2007.02686-B31B1B.svg)](https://arxiv.org/abs/2007.02686)
-[![Conference](http://img.shields.io/badge/NeurIPS-2020-4b44ce.svg)](https://nips.cc/Conferences/2020/AcceptedPapersInitial)
+[![Conference](http://img.shields.io/badge/NeurIPS-2020-4b44ce.svg)](https://proceedings.neurips.cc//paper/2020/hash/ee23e7ad9b473ad072d57aaa9b2a5222-Abstract.html)
 
 </div>
  
@@ -45,7 +45,7 @@ python train_hebb.py --environment CarRacing-v0 --hebb_rule ABCD_lr --generation
  Use `python train_hebb.py --help` to display all the training options:
 
 
- ```bash
+ ```
 
 train_hebb.py [--environment] [--hebb_rule] [--popsize] [--lr] [--decay] [--sigma] [--init_weights] [--print_every] [--generations] [--threads] [--folder] [--distribution]
 
@@ -65,7 +65,7 @@ train_hebb.py [--environment] [--hebb_rule] [--popsize] [--lr] [--decay] [--sigm
 ```
 
 Once trained, use `evaluate_hebb.py` to test the evolved agent:
- ```bash
+ ```
 
 python evaluate_hebb.py --environment CarRacing-v0 --hebb_rule ABCD_lr --path_hebb heb_coeffs.dat --path_coev cnn_parameters.dat --init_weights uni 
 
@@ -82,7 +82,7 @@ xvfb-run -a -s "-screen 0 1400x900x24 +extension RANDR" -- python train_hebb.py 
 
 If you use the code for academic or commecial use, please cite the associated paper:
 
-```
+```bibtex
 
 @inproceedings{Najarro2020,
 	title = {{Meta-Learning through Hebbian Plasticity in Random Networks}},
