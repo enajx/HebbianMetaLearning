@@ -36,6 +36,10 @@ def fitness_hebb(hebb_rule : str, environment : str, init_weights = 'uni' , *evo
                 torch.nn.init.uniform_(m.weight.data, -1, 1)
             elif init_weights == 'xa_uni_big':
                 torch.nn.init.xavier_uniform(m.weight.data)
+            elif init_weights == 'ones':
+                torch.nn.init.ones_(m.weight.data)
+            elif init_weights == 'zeros':
+                torch.nn.init.zeros_(m.weight.data)
             elif init_weights == 'default':
                 pass
             
