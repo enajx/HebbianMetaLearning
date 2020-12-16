@@ -172,17 +172,16 @@ class EvolutionStrategyHebb(object):
 
         param_try = []
         for index, i in enumerate(p):
-            jittered = self.SIGMA * i 
+            jittered = self.SIGMA * i
             param_try.append(w[index] + jittered)
-        param_try = np.array(param_try)
-        
+        param_try = np.array(param_try).astype(np.float32)
         return param_try
 
     def get_coeffs(self):
-        return self.coeffs
+        return self.coeffs.astype(np.float32)
     
     def get_coevolved_parameters(self):
-        return self.initial_weights_co
+        return self.initial_weights_co.astype(np.float32)
 
     def _get_population(self, coevolved_param = False): 
         
@@ -194,10 +193,10 @@ class EvolutionStrategyHebb(object):
                 x2 = []
                 for w in self.coeffs:
                     j = np.random.randn(*w.shape)  # j: (coefficients_per_synapse, 1) eg. (5,1)
-                    x.append(j)                    # x: (coefficients_per_synapse, number of synapses) eg. (92690, 5)
+                    x.append(j)                                # x: (coefficients_per_synapse, number of synapses) eg. (92690, 5)
                     x2.append(-j) 
 
-                population.append(x)               # population : (population size, coefficients_per_synapse, number of synapses), eg. (10, 92690, 5)
+                population.append(x)                           # population : (population size, coefficients_per_synapse, number of synapses), eg. (10, 92690, 5)
                 population.append(x2)
                 
         elif coevolved_param == True:
@@ -205,13 +204,14 @@ class EvolutionStrategyHebb(object):
                 x = []
                 x2 = []
                 for w in self.initial_weights_co:
-                    j = np.random.randn(*w.shape) 
+                    j = np.random.randn(*w.shape)
                     x.append(j)                    
                     x2.append(-j) 
 
                 population.append(x)               
                 population.append(x2)
                 
+        population = np.array(population).astype(np.float32)
         return population
 
 
@@ -225,9 +225,8 @@ class EvolutionStrategyHebb(object):
                 for index, i in enumerate(p):
                     jittered = self.SIGMA * i
                     heb_coeffs_try1.append(self.coeffs[index] + jittered) 
-                heb_coeffs_try = np.array(heb_coeffs_try1)
+                heb_coeffs_try = np.array(heb_coeffs_try1).astype(np.float32)
 
-                
                 worker_args.append( (self.get_reward, self.hebb_rule, self.environment,  self.init_weights,  heb_coeffs_try) )
                 
             rewards  = pool.map(worker_process_hebb, worker_args)
@@ -237,8 +236,8 @@ class EvolutionStrategyHebb(object):
             for p in population:
                 heb_coeffs_try = np.array(self._get_params_try(self.coeffs, p))
                 rewards.append(self.get_reward( self.hebb_rule, self.environment,  self.init_weights, heb_coeffs_try))
-        rewards = np.array(rewards)
-
+        
+        rewards = np.array(rewards).astype(np.float32)
         return rewards
     
 
@@ -252,13 +251,13 @@ class EvolutionStrategyHebb(object):
                 for index, i in enumerate(population[z]):
                     jittered = self.SIGMA * i
                     heb_coeffs_try1.append(self.coeffs[index] + jittered) 
-                heb_coeffs_try = np.array(heb_coeffs_try1)
+                heb_coeffs_try = np.array(heb_coeffs_try1).astype(np.float32)
                 
                 coevolved_parameters_try1 = []
                 for index, i in enumerate(population_coevolved[z]):
                     jittered = self.SIGMA * i
                     coevolved_parameters_try1.append(self.initial_weights_co[index] + jittered) 
-                coevolved_parameters_try = np.array(coevolved_parameters_try1)
+                coevolved_parameters_try = np.array(coevolved_parameters_try1).astype(np.float32)
             
                 worker_args.append( (self.get_reward, self.hebb_rule,  self.environment,  self.init_weights, heb_coeffs_try, coevolved_parameters_try) )
                 
@@ -270,8 +269,8 @@ class EvolutionStrategyHebb(object):
                 heb_coeffs_try = np.array(self._get_params_try(self.coeffs, population[z]))
                 coevolved_parameters_try = np.array(self._get_params_try(self.initial_weights_co, population_coevolved[z]))
                 rewards.append(self.get_reward( self.hebb_rule,  self.environment,  self.init_weights, heb_coeffs_try, coevolved_parameters_try))
-        rewards = np.array(rewards)
-
+        
+        rewards = np.array(rewards).astype(np.float32)
         return rewards
 
     def _update_coeffs(self, rewards, population):
