@@ -175,7 +175,9 @@ class EvolutionStrategyHebb(object):
             jittered = self.SIGMA * i
             param_try.append(w[index] + jittered)
         param_try = np.array(param_try).astype(np.float32)
+        
         return param_try
+        # return w + p*self.SIGMA
 
     def get_coeffs(self):
         return self.coeffs.astype(np.float32)
@@ -185,18 +187,21 @@ class EvolutionStrategyHebb(object):
 
     def _get_population(self, coevolved_param = False): 
         
-        population = []
+    
+        # x_ = np.random.randn(int(self.POPULATION_SIZE/2), self.coeffs.shape[0], self.coeffs[0].shape[0])
+        # population = np.concatenate((x_,-1*x_)).astype(np.float32)
         
+        population = []
+            
         if coevolved_param == False:
             for i in range( int(self.POPULATION_SIZE/2) ):
                 x = []
                 x2 = []
                 for w in self.coeffs:
-                    j = np.random.randn(*w.shape)  # j: (coefficients_per_synapse, 1) eg. (5,1)
-                    x.append(j)                                # x: (coefficients_per_synapse, number of synapses) eg. (92690, 5)
+                    j = np.random.randn(*w.shape).astype(np.float32)              # j: (coefficients_per_synapse, 1) eg. (5,1)
+                    x.append(j)                                                   # x: (coefficients_per_synapse, number of synapses) eg. (92690, 5)
                     x2.append(-j) 
-
-                population.append(x)                           # population : (population size, coefficients_per_synapse, number of synapses), eg. (10, 92690, 5)
+                population.append(x)                                              # population : (population size, coefficients_per_synapse, number of synapses), eg. (10, 92690, 5)
                 population.append(x2)
                 
         elif coevolved_param == True:
@@ -204,15 +209,14 @@ class EvolutionStrategyHebb(object):
                 x = []
                 x2 = []
                 for w in self.initial_weights_co:
-                    j = np.random.randn(*w.shape)
+                    j = np.random.randn(*w.shape).astype(np.float32)
                     x.append(j)                    
                     x2.append(-j) 
 
                 population.append(x)               
                 population.append(x2)
                 
-        population = np.array(population).astype(np.float32)
-        return population
+        return np.array(population).astype(np.float32)
 
 
     def _get_rewards(self, pool, population):
