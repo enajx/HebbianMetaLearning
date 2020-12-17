@@ -198,7 +198,7 @@ class EvolutionStrategyHebb(object):
                 x = []
                 x2 = []
                 for w in self.coeffs:
-                    j = np.random.randn(*w.shape).astype(np.float32)              # j: (coefficients_per_synapse, 1) eg. (5,1)
+                    j = np.random.randn(*w.shape)             # j: (coefficients_per_synapse, 1) eg. (5,1)
                     x.append(j)                                                   # x: (coefficients_per_synapse, number of synapses) eg. (92690, 5)
                     x2.append(-j) 
                 population.append(x)                                              # population : (population size, coefficients_per_synapse, number of synapses), eg. (10, 92690, 5)
@@ -209,7 +209,7 @@ class EvolutionStrategyHebb(object):
                 x = []
                 x2 = []
                 for w in self.initial_weights_co:
-                    j = np.random.randn(*w.shape).astype(np.float32)
+                    j = np.random.randn(*w.shape)
                     x.append(j)                    
                     x2.append(-j) 
 
