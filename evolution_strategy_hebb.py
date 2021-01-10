@@ -348,17 +348,15 @@ class EvolutionStrategyHebb(object):
                 
             # Print fitness and save Hebbian coefficients and/or Coevolved / CNNs parameters
             if (iteration + 1) % print_step == 0:
-                if self.pixel_env or self.coevolve_init:
-                    rew_ = np.sum(self.get_reward( self.hebb_rule,  self.environment,  self.init_weights, self.coeffs, self.initial_weights_co))
-                else:
-                    rew_ = np.sum(self.get_reward( self.hebb_rule,  self.environment,  self.init_weights, self.coeffs))                
+                rew_ = rewards.mean()
                 print('iter %4i | reward: %3i |  update_factor: %f  lr: %f | sum_coeffs: %i sum_abs_coeffs: %4i' % (iteration + 1, rew_ , self.update_factor, self.learning_rate, int(np.sum(self.coeffs)), int(np.sum(abs(self.coeffs)))), flush=True)
                 torch.save(self.get_coeffs(),  path + "/"+ id_ + '/HEBcoeffs__' + self.environment + "__rew_" + str(int(rew_)) + '__' + self.hebb_rule + "__init_" + str(self.init_weights) + "__pop_" + str(self.POPULATION_SIZE) + '__coeffs' + "__{}.dat".format(iteration))
-                if self.coevolve_init:
-                    torch.save(self.get_coevolved_parameters(),  path + "/"+ id_ + '/HEBcoeffs__' + self.environment + "__rew_" + str(int(rew_)) + '__' + self.hebb_rule + "__init_" + str(self.init_weights) + "__pop_" + str(self.POPULATION_SIZE) + '__coevolved_initial_weights' + "__{}.dat".format(iteration))
-                elif self.pixel_env:
-                    torch.save(self.get_coevolved_parameters(),  path + "/"+ id_ + '/HEBcoeffs__' + self.environment + "__rew_" + str(int(rew_)) + '__' + self.hebb_rule + "__init_" + str(self.init_weights) + "__pop_" + str(self.POPULATION_SIZE) + '__CNN_parameters' + "__{}.dat".format(iteration))
-                    
+                if rew_ > 100:
+                    if self.coevolve_init:
+                        torch.save(self.get_coevolved_parameters(),  path + "/"+ id_ + '/HEBcoeffs__' + self.environment + "__rew_" + str(int(rew_)) + '__' + self.hebb_rule + "__init_" + str(self.init_weights) + "__pop_" + str(self.POPULATION_SIZE) + '__coevolved_initial_weights' + "__{}.dat".format(iteration))
+                    elif self.pixel_env:
+                        torch.save(self.get_coevolved_parameters(),  path + "/"+ id_ + '/HEBcoeffs__' + self.environment + "__rew_" + str(int(rew_)) + '__' + self.hebb_rule + "__init_" + str(self.init_weights) + "__pop_" + str(self.POPULATION_SIZE) + '__CNN_parameters' + "__{}.dat".format(iteration))
+                        
                 generations_rewards.append(rew_)
                 np.save(path + "/"+ id_ + '/Fitness_values_' + id_ + '_' + self.environment + '.npy', np.array(generations_rewards))
        
