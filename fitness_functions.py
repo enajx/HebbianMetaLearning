@@ -142,6 +142,7 @@ def fitness_hebb(hebb_rule : str, environment : str, init_weights = 'uni' , *evo
         neg_count = 0
         rew_ep = 0
         t = 0
+        # for _ in range(1000):
         while True:
             
             # For obaservation ∈ gym.spaces.Discrete, we one-hot encode the observation
@@ -218,6 +219,8 @@ def fitness_hebb(hebb_rule : str, environment : str, init_weights = 'uni' , *evo
                 weights1_2, weights2_3, weights3_4 = hebbian_update_ABCD_lr_D_out(hebb_coeffs, weights1_2, weights2_3, weights3_4, o0, o1, o2, o3)
             elif hebb_rule == 'ABCD_lr_D_in_and_out':
                 weights1_2, weights2_3, weights3_4 = hebbian_update_ABCD_lr_D_in_and_out(hebb_coeffs, weights1_2, weights2_3, weights3_4, o0, o1, o2, o3)
+            elif hebb_rule == 'neuralHebb':                                             
+                weights1_2, weights2_3, weights3_4 = neural_hebbian_update(hebb_coeffs, weights1_2, weights2_3, weights3_4, o0, o1, o2, o3)
             else:
                 raise ValueError('The provided Hebbian rule is not valid')
                 

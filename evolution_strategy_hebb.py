@@ -83,6 +83,9 @@ class EvolutionStrategyHebb(object):
             self.coefficients_per_synapse = 5
         elif hebb_rule == 'ABCD_lr_D_in_and_out':                                             
             self.coefficients_per_synapse = 6
+        elif hebb_rule == 'neuralHebb':                                             
+            # self.coefficients_per_synapse = 9
+            self.coefficients_per_synapse = 18
         else:
             raise ValueError('The provided Hebbian rule is not valid')
             
