@@ -65,27 +65,12 @@ class EvolutionStrategyHebb(object):
         self.distribution = distribution                      
 
         # The number of hebbian coefficients per synapse
-        if hebb_rule == 'A':                                                     
-            self.coefficients_per_synapse = 1
-        elif hebb_rule == 'AD':                                                
-            self.coefficients_per_synapse = 2
-        elif hebb_rule == 'AD_lr':                                             
-            self.coefficients_per_synapse = 3
-        elif hebb_rule == 'ABC':                                                
-            self.coefficients_per_synapse = 3
-        elif hebb_rule == 'ABC_lr':                                             
-            self.coefficients_per_synapse = 4
-        elif hebb_rule == 'ABCD':                                             
-            self.coefficients_per_synapse = 4
-        elif hebb_rule == 'ABCD_lr':                                           
-            self.coefficients_per_synapse = 5
-        elif hebb_rule == 'ABCD_lr_D_out':                                             
-            self.coefficients_per_synapse = 5
-        elif hebb_rule == 'ABCD_lr_D_in_and_out':                                             
-            self.coefficients_per_synapse = 6
-        elif hebb_rule == 'neuralHebb':                                             
-            # self.coefficients_per_synapse = 9
+        if hebb_rule == 'neuralHebb2':                                             
+            self.coefficients_per_synapse = 9
+        elif hebb_rule == 'neuralHebb3':                                             
             self.coefficients_per_synapse = 18
+        elif hebb_rule == 'neuralHebb3withBias':                                             
+            self.coefficients_per_synapse = 25
         else:
             raise ValueError('The provided Hebbian rule is not valid')
             

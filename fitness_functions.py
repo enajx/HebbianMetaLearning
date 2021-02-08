@@ -201,26 +201,12 @@ def fitness_hebb(hebb_rule : str, environment : str, init_weights = 'uni' , *evo
             
             
             #### Episodic/Intra-life hebbian update of the weights
-            if hebb_rule == 'A': 
-                weights1_2, weights2_3, weights3_4 = hebbian_update_A(hebb_coeffs, weights1_2, weights2_3, weights3_4, o0, o1, o2, o3)
-            elif hebb_rule == 'AD':
-                weights1_2, weights2_3, weights3_4 = hebbian_update_AD(hebb_coeffs, weights1_2, weights2_3, weights3_4, o0, o1, o2, o3)
-            elif hebb_rule == 'AD_lr':
-                weights1_2, weights2_3, weights3_4 = hebbian_update_AD_lr(hebb_coeffs, weights1_2, weights2_3, weights3_4, o0, o1, o2, o3)
-            elif hebb_rule == 'ABC':
-                weights1_2, weights2_3, weights3_4 = hebbian_update_ABC(hebb_coeffs, weights1_2, weights2_3, weights3_4, o0, o1, o2, o3)
-            elif hebb_rule == 'ABC_lr':
-                weights1_2, weights2_3, weights3_4 = hebbian_update_ABC_lr(hebb_coeffs, weights1_2, weights2_3, weights3_4, o0, o1, o2, o3)
-            elif hebb_rule == 'ABCD':
-                weights1_2, weights2_3, weights3_4 = hebbian_update_ABCD(hebb_coeffs, weights1_2, weights2_3, weights3_4, o0, o1, o2, o3)
-            elif hebb_rule == 'ABCD_lr':
-                weights1_2, weights2_3, weights3_4 = hebbian_update_ABCD_lr_D_in(hebb_coeffs, weights1_2, weights2_3, weights3_4, o0, o1, o2, o3)
-            elif hebb_rule == 'ABCD_lr_D_out':
-                weights1_2, weights2_3, weights3_4 = hebbian_update_ABCD_lr_D_out(hebb_coeffs, weights1_2, weights2_3, weights3_4, o0, o1, o2, o3)
-            elif hebb_rule == 'ABCD_lr_D_in_and_out':
-                weights1_2, weights2_3, weights3_4 = hebbian_update_ABCD_lr_D_in_and_out(hebb_coeffs, weights1_2, weights2_3, weights3_4, o0, o1, o2, o3)
-            elif hebb_rule == 'neuralHebb':                                             
-                weights1_2, weights2_3, weights3_4 = neural_hebbian_update(hebb_coeffs, weights1_2, weights2_3, weights3_4, o0, o1, o2, o3)
+            if hebb_rule == 'neuralHebb2':                                             
+                weights1_2, weights2_3, weights3_4 = neural_hebbian_update_ML2(hebb_coeffs, weights1_2, weights2_3, weights3_4, o0, o1, o2, o3)
+            elif hebb_rule == 'neuralHebb3':                                             
+                weights1_2, weights2_3, weights3_4 = neural_hebbian_update_ML3(hebb_coeffs, weights1_2, weights2_3, weights3_4, o0, o1, o2, o3)
+            elif hebb_rule == 'neuralHebb3withBias':                                             
+                weights1_2, weights2_3, weights3_4 = neural_hebbian_update_ML3withBias(hebb_coeffs, weights1_2, weights2_3, weights3_4, o0, o1, o2, o3)
             else:
                 raise ValueError('The provided Hebbian rule is not valid')
                 
